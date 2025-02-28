@@ -1,5 +1,6 @@
 package com.sunnyweather.android.ui.place
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,20 +9,37 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.sunnyweather.android.R
 import com.sunnyweather.android.logic.model.Place
+import com.sunnyweather.android.ui.weather.WeatherActivity
 
 /**
  * @author shiningYang
  * @date 2025-02-26-22:22
  * @description:
  */
-class PlaceAdapter(private val fragment: Fragment, private val placeList: List<Place>) : RecyclerView.Adapter<PlaceAdapter.ViewHolder>() {
+class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: List<Place>) : RecyclerView.Adapter<PlaceAdapter.ViewHolder>() {
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val placeName: TextView = view.findViewById(R.id.placeName)
         val placeAddress: TextView = view.findViewById(R.id.placeAddress)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceAdapter.ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.place_item, parent, false)
-        return ViewHolder(view)
+        val holder = ViewHolder(view)
+
+        holder.itemView.setOnClickListener {
+            val position = holder.bindingAdapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                val intent = Intent(parent.context, WeatherActivity::class.java).apply {
+                    putExtra("location_lng", placeList[position].location.lng)
+                    putExtra("location_lat", placeList[position].location.lat)
+                    putExtra("place_name", placeList[position].name)
+                }
+                fragment.viewModel.savePlace(placeList[position])
+                fragment.startActivity(intent)
+                fragment.activity?.finish()
+            }
+        }
+
+        return holder
     }
 
     override fun onBindViewHolder(holder: PlaceAdapter.ViewHolder, position: Int) {
