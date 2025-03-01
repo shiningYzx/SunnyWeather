@@ -123,7 +123,7 @@ class WeatherActivity : AppCompatActivity() {
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
         swipeRefresh.isRefreshing = true
     }
-    
+
 
     private fun showWeatherInfo(weather: Weather) {
         placeName.text = viewModel.placeName
