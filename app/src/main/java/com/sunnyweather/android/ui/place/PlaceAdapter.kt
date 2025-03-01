@@ -28,14 +28,24 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
         holder.itemView.setOnClickListener {
             val position = holder.bindingAdapterPosition
             if (position != RecyclerView.NO_POSITION) {
-                val intent = Intent(parent.context, WeatherActivity::class.java).apply {
-                    putExtra("location_lng", placeList[position].location.lng)
-                    putExtra("location_lat", placeList[position].location.lat)
-                    putExtra("place_name", placeList[position].name)
+                val place = placeList[position]
+                val activity = fragment.activity
+                if (activity is WeatherActivity) {
+                    activity.drawerLayout.closeDrawers()
+                    activity.viewModel.locationLng = place.location.lng
+                    activity.viewModel.locationLat = place.location.lat
+                    activity.viewModel.placeName = place.name
+                    activity.refreshWeather()
+                } else {
+                    val intent = Intent(parent.context, WeatherActivity::class.java).apply {
+                        putExtra("location_lng", placeList[position].location.lng)
+                        putExtra("location_lat", placeList[position].location.lat)
+                        putExtra("place_name", placeList[position].name)
+                    }
+                    fragment.startActivity(intent)
+                    fragment.activity?.finish()
                 }
                 fragment.viewModel.savePlace(placeList[position])
-                fragment.startActivity(intent)
-                fragment.activity?.finish()
             }
         }
 
